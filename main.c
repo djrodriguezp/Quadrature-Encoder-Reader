@@ -37,7 +37,7 @@ void PORTA_IRQHandler(void)
 }
 
 void SysTick_Handler (void) {
-	rpm = ((ticks - oldticks) * (60000.f / interruptPeriod)) / encoderResolution; //60000 milisegundos en 1 minuto para calcular rpms
+	rpm = ((ticks - oldticks) * (60000.f / interruptPeriod)) / encoderResolution; //60000 milisegundos en 1 minuto para calcular rpm
 	linearVelocity =  0.10472 * wheelRadius * rpm ; //(2PI/60) * radio * rpm
 	oldticks = ticks;
 }
@@ -80,6 +80,9 @@ int main()
 	PORTC_ISFR |= (6<<1);
 	NVIC_EnableIRQ(PORTC_IRQn);
 	
+	SystemCoreClockUpdate ();  
+	SysTick_Config(SystemCoreClock/100); //interrupcion periodica cada 10ms
+	
 	//configuracion para PWM en puerto c pin 2
 	FTM0_SC |= 0x004F;			
 	FTM0_MOD = 255;			
@@ -107,8 +110,7 @@ int main()
 
 	uint8_t ch;
 	
-	SystemCoreClockUpdate ();  
-	SysTick_Config(SystemCoreClock/100); //interrupcion cada 10ms
+
 	
 	while(1){
 		char buf[50];
